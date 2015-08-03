@@ -7,33 +7,80 @@ package gojimux
 import (
 	"net/http"
 
-	"github/quorumsco/application"
+	"github.com/zenazn/goji/web"
 )
 
-func (r *Router) Get(path interface{}, handle http.HandlerFunc) {
-	r.Handle("GET", path, handle)
+var router = "goji"
+
+func Get(path interface{}, handle http.HandlerFunc, router interface{}) {
+	if router == "mux" {
+		router.(Mux).Get(path, handle)
+	} else if router == "goji" {
+		router.(*web.Mux).Get(path, handle)
+	}
 }
 
-func (r *Router) Post(path interface{}, handle http.HandlerFunc) {
-	r.Handle("POST", path, handle)
+func Post(path interface{}, handle http.HandlerFunc, router interface{}) {
+	if router == "mux" {
+		router.(Mux).Post(path, handle)
+	} else if router == "goji" {
+		router.(*web.Mux).Post(path, handle)
+	}
 }
 
-func (r *Router) Put(path interface{}, handle http.HandlerFunc) {
-	r.Handle("PUT", path, handle)
+func Put(path interface{}, handle http.HandlerFunc, router interface{}) {
+	if router == "mux" {
+		router.(Mux).Put(path, handle)
+	} else if router == "goji" {
+		router.(*web.Mux).Put(path, handle)
+	}
 }
 
-func (r *Router) Patch(path interface{}, handle http.HandlerFunc) {
-	r.Handle("PATCH", path, handle)
+func Patch(path interface{}, handle http.HandlerFunc, router interface{}) {
+	if router == "mux" {
+		router.(Mux).Patch(path, handle)
+	} else if router == "goji" {
+		router.(*web.Mux).Patch(path, handle)
+	}
 }
 
-func (r *Router) Delete(path interface{}, handle http.HandlerFunc) {
-	r.Handle("DELETE", path, handle)
+func Delete(path interface{}, handle http.HandlerFunc, router interface{}) {
+	if router == "mux" {
+		router.(Mux).Delete(path, handle)
+	} else if router == "goji" {
+		router.(*web.Mux).Delete(path, handle)
+	}
 }
 
-func (r *Router) Options(path interface{}, handle http.HandlerFunc) {
-	r.Handle("OPTIONS", path, handle)
+func Options(path interface{}, handle http.HandlerFunc, router interface{}) {
+	if router == "mux" {
+		router.(Mux).Options(path, handle)
+	} else if router == "goji" {
+		router.(*web.Mux).Options(path, handle)
+	}
 }
 
-func (r *Router) Use(handler func(http.Handler) http.Handler) {
-	app.Components["Mux"].(Mux).Use(handler)
+func Use(handler func(http.Handler) http.Handler, router interface{}) {
+	if router == "mux" {
+		router.(Mux).Use(handler)
+	} else if router == "goji" {
+		router.(*web.Mux).Use(handler)
+	}
+}
+
+func ServeHTTP(w http.ResponseWriter, req *http.Request, router interface{}) {
+	if router == "mux" {
+		router.(Mux).ServeHTTP(w, req)
+	} else if router == "goji" {
+		router.(*web.Mux).ServeHTTP(w, req)
+	}
+}
+
+func ListenAndServe(listen string, router interface{}) error {
+	if router == "mux" {
+		return ListenAndServe(listen, router.(Mux))
+	} else if router == "goji" {
+		return ListenAndServe(listen, router.(*web.Mux))
+	}
+	return nil
 }
