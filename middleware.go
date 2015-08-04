@@ -14,5 +14,3 @@ func InitContext(c *web.C, h http.Handler) http.Handler {
 	}
 	return http.HandlerFunc(fn)
 }
-
-//URLParams map[string]string
