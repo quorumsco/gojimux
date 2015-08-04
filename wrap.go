@@ -1,55 +1,74 @@
 package gojimux
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 
+	// "github.com/quorumsco/jsonapi"
 	"github.com/quorumsco/logs"
+	"github.com/quorumsco/router"
 	"github.com/zenazn/goji/web"
 )
 
 type Gojimux struct {
-	Components map[string]interface{}
+	Mux *web.Mux
 }
 
 func New() *Gojimux {
 	var app = new(Gojimux)
-	app.Components = make(map[string]interface{})
+	app.Mux = web.New()
 	return app
 }
 
 func (app Gojimux) Get(path interface{}, handle http.HandlerFunc) {
-	app.Components["Mux"].(*web.Mux).Get(path, handle)
+	app.Mux.Get(path, app.putContext(handle))
 }
 
 func (app Gojimux) Post(path interface{}, handle http.HandlerFunc) {
-	app.Components["Mux"].(*web.Mux).Post(path, handle)
+	app.Mux.Post(path, app.putContext(handle))
 }
 
 func (app Gojimux) Put(path interface{}, handle http.HandlerFunc) {
-	app.Components["Mux"].(*web.Mux).Put(path, handle)
+	app.Mux.Put(path, handle)
 }
 
 func (app Gojimux) Patch(path interface{}, handle http.HandlerFunc) {
-	app.Components["Mux"].(*web.Mux).Patch(path, handle)
+	app.Mux.Patch(path, app.putContext(handle))
 }
 
 func (app Gojimux) Delete(path interface{}, handle http.HandlerFunc) {
-	app.Components["Mux"].(*web.Mux).Delete(path, handle)
+	app.Mux.Delete(path, app.putContext(handle))
 }
 
 func (app Gojimux) Options(path interface{}, handle http.HandlerFunc) {
-	app.Components["Mux"].(*web.Mux).Options(path, handle)
+	app.Mux.Options(path, app.putContext(handle))
 }
 
 func (app Gojimux) Use(handler func(http.Handler) http.Handler) {
-	app.Components["Mux"].(*web.Mux).Use(handler)
+	app.Mux.Use(handler)
 }
 
 func (app Gojimux) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	app.Components["Mux"].(*web.Mux).ServeHTTP(w, req)
+	app.Mux.ServeHTTP(w, req)
 }
 
 func (app Gojimux) Serve(listen string) error {
 	logs.Info("listening on http://%s", listen)
-	return http.ListenAndServe(listen, app.Components["Mux"].(*web.Mux))
+	return http.ListenAndServe(listen, app.Mux)
+}
+
+func (app Gojimux) putContext(handle http.HandlerFunc) func(web.C, http.ResponseWriter, *http.Request) {
+	fn := func(c web.C, w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(c.URLParams["id"])
+		if err != nil {
+			logs.Debug(err)
+			handle(w, r)
+			return
+		}
+		fmt.Println(id)
+		router.Context(r).Env["id"] = id
+		handle(w, r)
+	}
+	return fn
 }
