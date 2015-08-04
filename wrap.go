@@ -3,7 +3,6 @@ package gojimux
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 
 	// "github.com/quorumsco/jsonapi"
 	"github.com/quorumsco/logs"
@@ -60,14 +59,13 @@ func (app Gojimux) Serve(listen string) error {
 
 func (app Gojimux) putContext(handle http.HandlerFunc) func(web.C, http.ResponseWriter, *http.Request) {
 	fn := func(c web.C, w http.ResponseWriter, r *http.Request) {
-		id, err := strconv.Atoi(c.URLParams["id"])
-		if err != nil {
-			logs.Debug(err)
-			handle(w, r)
-			return
+		param := new(router.Param)
+		for name, value := range c.URLParams {
+			param.Name = name
+			param.Value = value
+			router.Context(r).Params = append(router.Context(r).Params, *param)
+			fmt.Printf("%s -> %s\n", name, value)
 		}
-		fmt.Println(id)
-		router.Context(r).Env["id"] = id
 		handle(w, r)
 	}
 	return fn
