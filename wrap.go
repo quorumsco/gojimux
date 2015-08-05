@@ -1,7 +1,6 @@
 package gojimux
 
 import (
-	"fmt"
 	"net/http"
 
 	// "github.com/quorumsco/jsonapi"
