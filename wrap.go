@@ -64,7 +64,6 @@ func (app Gojimux) putContext(handle http.HandlerFunc) func(web.C, http.Response
 			param.Name = name
 			param.Value = value
 			router.Context(r).Params = append(router.Context(r).Params, *param)
-			fmt.Printf("%s -> %s\n", name, value)
 		}
 		handle(w, r)
 	}
