@@ -3,7 +3,6 @@ package gojimux
 import (
 	"net/http"
 
-	// "github.com/quorumsco/jsonapi"
 	"github.com/quorumsco/logs"
 	"github.com/quorumsco/router"
 	"github.com/zenazn/goji/web"
@@ -16,7 +15,7 @@ type Gojimux struct {
 func New() *Gojimux {
 	var app = new(Gojimux)
 	app.Mux = web.New()
-	app.Mux.Use(gojimux.InitContext)
+	app.Mux.Use(InitContext)
 	return app
 }
 
