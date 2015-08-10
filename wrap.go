@@ -16,6 +16,7 @@ type Gojimux struct {
 func New() *Gojimux {
 	var app = new(Gojimux)
 	app.Mux = web.New()
+	app.Mux.Use(gojimux.InitContext)
 	return app
 }
 
